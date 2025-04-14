@@ -1,8 +1,9 @@
 ﻿using HarmonyLib;
+using Il2CppScheduleOne;
+using Il2CppScheduleOne.ItemFramework;
+using Il2CppScheduleOne.UI.Items;
 using MelonLoader;
-using ScheduleOne;
-using ScheduleOne.ItemFramework;
-using ScheduleOne.UI.Items;
+
 using UnityEngine;
 
 [assembly: MelonInfo(typeof(ImprovedStackSelection.ImprovedStackSelection), "Improved Stack Selection", "1.0.0", "Vgc12")]
@@ -10,16 +11,18 @@ namespace ImprovedStackSelection
 {
     public class ImprovedStackSelection : MelonMod
     {
-  
+        
         [HarmonyPatch(typeof(ItemUIManager), "UpdateCashDragAmount", typeof(CashInstance))]
         private static class UpdateCashDragAmountPatch
         {
+            
+            
             public static bool Prefix(ItemUIManager __instance, CashInstance instance)
             {
-               
+            
                
                 if(GameInput.MouseScrollDelta == 0) return false;
-                var draggedCashAmount = Traverse.Create(__instance).Field("draggedCashAmount");
+                
                 
                 var denomination = 1;
                 
@@ -32,12 +35,10 @@ namespace ImprovedStackSelection
                     denomination = 100;
                 }
                 
-                
                 denomination = GameInput.MouseScrollDelta < 0 ? -denomination : denomination;
-                
                
-                draggedCashAmount.SetValue(Mathf.Clamp(draggedCashAmount.GetValue<float>() + denomination, 1f,
-                   Mathf.Min(instance.Balance, 1000f)));
+                __instance.draggedCashAmount = Mathf.Clamp(__instance.draggedCashAmount + denomination, 1f,
+                   Mathf.Min(instance.Balance, 1000f));
                 return false;
                 
             }
